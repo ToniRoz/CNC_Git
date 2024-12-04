@@ -11,8 +11,16 @@
 
 ///////////////////// VARIABLES ////////////////////
 
-bool is_button_pressed = false;  // Global variable to track button state
-lv_timer_t *button_timer = NULL;
+#define HOLD_DELAY 100 // Delay in milliseconds for repeated actions
+
+// Timers for each button
+lv_timer_t *timer_Xplus = NULL;
+lv_timer_t *timer_Xminus = NULL;
+lv_timer_t *timer_Yplus = NULL;
+lv_timer_t *timer_Yminus = NULL;
+lv_timer_t *timer_Zplus = NULL;
+lv_timer_t *timer_Zminus = NULL;
+
 
 
 // SCREEN: ui_ActivationScreen
@@ -118,6 +126,13 @@ lv_obj_t * ui____initial_actions0;
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
+
+void hold_timer_cb(lv_timer_t *timer) {
+    void (*action)(lv_event_t *) = (void (*)(lv_event_t *))timer->user_data;
+    action(NULL); // Execute the increment/decrement function
+}
+
+
 void handle_timer_event(lv_event_t *e, void (*callback)(lv_timer_t *), uint32_t delay) {
     lv_event_code_t event_code = lv_event_get_code(e);
     if (event_code == LV_EVENT_PRESSED) {
@@ -331,55 +346,93 @@ void ui_event_RunProgramBackButton(lv_event_t * e)
         _ui_screen_delete(&ui_RunProgramScreen);
     }
 }
-void ui_event_ButtonYminus2(lv_event_t * e)
-{
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Decrement_Y(e);
+// Event handler for X+ button
+void ui_event_ButtonXplus(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Xplus == NULL) {
+            timer_Xplus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Decrement_X);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Xplus != NULL) {
+            lv_timer_del(timer_Xplus);
+            timer_Xplus = NULL;
+        }
     }
 }
 
-void ui_event_ButtonXminus2(lv_event_t * e)
-{
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Decrement_X(e);
-    }
-}
-void ui_event_ButtonXplus2(lv_event_t * e)
-{
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Increment_X(e);
-    }
-}
-
-void ui_event_ButtonYplus2(lv_event_t * e) {
-
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Increment_Y(e);
+// Event handler for X- button
+void ui_event_ButtonXminus(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Xminus == NULL) {
+            timer_Xminus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Increment_X);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Xminus != NULL) {
+            lv_timer_del(timer_Xminus);
+            timer_Xminus = NULL;
+        }
     }
 }
 
-void ui_event_ButtonZplus2(lv_event_t * e)
-{
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Increment_Z(e);
+// Event handler for Y+ button
+void ui_event_ButtonYplus2(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Yplus == NULL) {
+            timer_Yplus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Increment_Y);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Yplus != NULL) {
+            lv_timer_del(timer_Yplus);
+            timer_Yplus = NULL;
+        }
     }
 }
-void ui_event_ButtonZminus2(lv_event_t * e)
-{
-     lv_event_code_t event_code = lv_event_get_code(e);
-    lv_obj_t * target = lv_event_get_target(e);
-    if(event_code == LV_EVENT_CLICKED) {
-        Decrement_Z(e);
+
+// Event handler for Y- button
+void ui_event_ButtonYminus2(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Yminus == NULL) {
+            timer_Yminus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Decrement_Y);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Yminus != NULL) {
+            lv_timer_del(timer_Yminus);
+            timer_Yminus = NULL;
+        }
+    }
+}
+
+// Event handler for Z+ button
+void ui_event_ButtonZplus2(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Zplus == NULL) {
+            timer_Zplus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Increment_Z);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Zplus != NULL) {
+            lv_timer_del(timer_Zplus);
+            timer_Zplus = NULL;
+        }
+    }
+}
+
+// Event handler for Z- button
+void ui_event_ButtonZminus2(lv_event_t *e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+    if (event_code == LV_EVENT_PRESSED) {
+        if (timer_Zminus == NULL) {
+            timer_Zminus = lv_timer_create(hold_timer_cb, HOLD_DELAY, (void *)Decrement_Z);
+        }
+    } else if (event_code == LV_EVENT_RELEASED) {
+        if (timer_Zminus != NULL) {
+            lv_timer_del(timer_Zminus);
+            timer_Zminus = NULL;
+        }
     }
 }
 void ui_event_MontagePunktButton(lv_event_t * e)
